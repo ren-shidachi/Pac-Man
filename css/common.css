@@ -1,0 +1,31 @@
+/* Reset css*/
+html, body, p, span, div, h1, h2, canvas {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    font-size: 100%;
+    font: inherit;
+    border: 0px;
+}
+
+body {
+    background: #888;
+}
+
+h1 {
+    color: #fff;
+    font-size: 48pt;
+    font-family: "Arial", "sans-serif";
+}
+
+div {
+    display: block;
+}
+
+#main-area #game-start {
+    background: #888;
+    width: 48px;
+    height: 22px;
+    padding-top: 2px;
+    text-align: center;
+}
