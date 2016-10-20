@@ -117,9 +117,17 @@ function PacMan() {
         this.height = 8;
         this.isColliding = false;
     };
+
     this.draw = function (z){
         this.context.drawImage(imageRepository.parts, 0, 8, 13, 13, (8*(this.x)-6)*z, (8*this.y-3)*z, 13*z,13*z);
     };
+
+    this.move = function (z) {
+        this.context.clearRect((8*(this.x)-6)*z, (8*this.y-3)*z, 13*z,13*z);
+        this.x = this.x-1;
+        this.draw(z);
+    }
+
 }
 PacMan.prototype = new Drawable();
 
@@ -164,7 +172,26 @@ function Game(){
         ];
         this.background.draw(map, zoomFactor);
         this.pacman.draw(zoomFactor);
+        requestAnimationFrame(frame);
     }
+}
+
+/**
+ * The process for each "frame" of the game.
+ */
+var startTime = -1;
+function frame (timeStamp) {
+    var progress = 0;
+
+    if (startTime < 0) {
+        startTime = timeStamp;
+    } else {
+        progress = timeStamp - startTime;
+    }
+
+    game.pacman.move(zoomFactor);
+
+    requestAnimationFrame(frame);
 }
 
 
@@ -173,7 +200,7 @@ function Game(){
  * Finds the first API that works to optimize the animation loop,
  * otherwize defaults to setTimeout().
  */
-window.requestAnimFrame = (function(){
+var requestAnimationFrame = (function(){
     return window.requestAnimationFrame ||
         window.webkitRequestAnimationFrame ||
         window.mozRequestAnimationFrame ||
@@ -186,9 +213,10 @@ window.requestAnimFrame = (function(){
 
 
 // main
+var game = new Game();
+var zoomFactor = 4;
 $(function () {
     // Resize game area
-    var zoomFactor = 4;
     var width = $("#main-area").width() * zoomFactor;
     var height = $("#main-area").height() * zoomFactor;
     $("#main-area").width(width).height(height);
@@ -197,7 +225,6 @@ $(function () {
         this.height = height;
     });
     $("#game-start").click(function () {
-        var game = new Game();
         if (game.init()) {
             game.start(zoomFactor);
         }
