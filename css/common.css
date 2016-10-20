@@ -14,7 +14,7 @@ body {
 
 h1 {
     color: #fff;
-    font-size: 48pt;
+    font-size: 32pt;
     font-family: "Arial", "sans-serif";
 }
 
@@ -22,10 +22,27 @@ div {
     display: block;
 }
 
-#main-area #game-start {
+#main-area {
+    position: relative;
+    width: 48px;
+    height: 64px;
+}
+
+#main-area canvas{
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    background: transparent;
+}
+
+#game-start {
+    position: relative;
+    cursor: pointer;
     background: #888;
     width: 48px;
     height: 22px;
+    left: 0px;
+    top: 0px;
     padding-top: 2px;
     text-align: center;
 }
