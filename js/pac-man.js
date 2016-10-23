@@ -124,7 +124,7 @@ function PacMan() {
 
     this.move = function (z) {
         this.context.clearRect((8*(this.x)-6)*z, (8*this.y-3)*z, 13*z,13*z);
-        this.x = this.x-1;
+        //this.x = this.x-1;
         this.draw(z);
     }
 
@@ -161,14 +161,14 @@ function Game(){
     };
     this.start = function (zoomFactor) {
         var map = [
-            [6,9,9,9,9,3],
-            [10,0,0,0,0,8],
-            [10,0,6,3,0,8],
-            [10,0,2,2,0,8],
-            [10,0,2,2,0,8],
-            [10,0,5,4,0,8],
-            [10,0,0,0,0,8],
-            [5,7,7,7,7,4],
+            [18,7,7,7,7,15],
+            [8,0,0,0,0,10],
+            [8,0,6,3,0,10],
+            [8,0,2,2,0,10],
+            [8,0,2,2,0,10],
+            [8,0,5,4,0,10],
+            [8,0,0,0,0,10],
+            [17,9,9,9,9,16],
         ];
         this.background.draw(map, zoomFactor);
         this.pacman.draw(zoomFactor);
