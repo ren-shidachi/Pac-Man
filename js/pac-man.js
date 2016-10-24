@@ -57,36 +57,34 @@ KEY_CODES = {
 KEY_STATUS = {};
 for (code in KEY_CODES){
     KEY_STATUS[KEY_CODES[code]] = false;
-
 }
+
 /**
  * Sets up the document to listen to onekeydown events (fired when
  * any key on the keyboard is pressed down). When a key is pressed
  * it sets the appropriate direction to ture to let us know shich
  * key it was.
  */
-document.onkeydown = function(e) {
-    // Firefox and oper ause charCode instead of keyCode to
-    // return which key was pressed.
-    var keyCode = (e.keyCode) ? e.keyCode : e.charCode;
+$(document).keydown(function(e) {
+    var keyCode = e.which;
     if (KEY_CODES[keyCode]) {
         e.preventDefault();
         KEY_STATUS[KEY_CODES[keyCode]] = true;
     }
-}
+});
 /**
  * Sets up the document to listen to ownkeyup events (fried when
  * any key on the keyboared is released). When a key is released.
  * it sets the appropriate direction to false to let us know which
  * key it was.
  */
-document.onkeyup = function(e) {
-    var keyCode = (e.keyCode) ? e.keyCode : e.charCode;
+$(document).keyup(function(e) {
+    var keyCode = e.which;
     if (KEY_CODES[keyCode]) {
         e.preventDefault();
         KEY_STATUS[KEY_CODES[keyCode]] = false;
     }
-}
+})
 
 /**
  * Creates the Background object which will become a child of
@@ -113,9 +111,12 @@ function PacMan() {
     this.init = function(x, y){
         this.x = x;
         this.y = y;
-        this.width = 8;
-        this.height = 8;
+        this.width = 13;
+        this.height = 13;
+        this.xSpeed = 0;
+        this.ySpeed = 0;
         this.isColliding = false;
+        return this;
     };
 
     this.draw = function (z){
@@ -123,9 +124,29 @@ function PacMan() {
     };
 
     this.move = function (z) {
-        this.context.clearRect((8*(this.x)-6)*z, (8*this.y-3)*z, 13*z,13*z);
-        //this.x = this.x-1;
-        this.draw(z);
+        this.x += this.xSpeed;
+        this.y += this.ySpeed;
+        //this.context.clearRect((8*(this.x)-6)*z, (8*this.y-3)*z, 13*z,13*z);
+        return this;
+    }
+
+    this.changeDirection = function (d){
+        if (d == 'left') {
+            this.xSpeed = -1;
+            this.ySpeed = 0;
+        }else if (d == 'right') {
+            this.xSpeed = 1;
+            this.ySpeed = 0;
+        }else if (d == 'up') {
+            this.xSpeed = 0;
+            this.ySpeed = -1;
+        }else if (d == 'down') {
+            this.xSpeed = 0;
+            this.ySpeed = 1;
+        } else {
+            return false;
+        }
+        return this;
     }
 
 }
