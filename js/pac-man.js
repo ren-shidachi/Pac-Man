@@ -12,33 +12,35 @@ var imageRepository = new function(){
 }
 
 /**
- * Create the Drawable object which will be the base clas for
+ * Create the Drawable object which will be the base class for
  * all drawable objects in the game. Sets up default variables
  * that all child object will inherit, as well as the default
  * functions.
  */
-function Drawable(){
-    this.init = function(x, y, width, height){
+class Drawable {
+    constructor (){
+        this.speed = 0;
+        this.canvasWidth = 0;
+        this.canvasHeight = 0;
+        this.collidableWith = "";
+        this.type = "";
+    }
+    init (x, y, width, height) {
         this.x = x;
         this.y = y;
         this.width = width;
         this.height = height;
         this.isColliding = false;
-    };
-    this.speed = 0;
-    this.canvasWidth = 0;
-    this.canvasHeight = 0;
-    this.collidableWith = "";
-    this.type = "";
+    }
 
     // Define abstract functioin to be implemented in child objects
-    this.draw = function() {
-    };
-    this.move = function() {
-    };
-    this.isCollidableWith = function() {
+    draw () {
+    }
+    move () {
+    }
+    isCollidableWith () {
         return (this.collidableWith === object.type);
-    };
+    }
 }
 
 // The keycode sthat wil lbe mapped when a user presses a button.
@@ -151,6 +153,33 @@ function PacMan() {
 
 }
 PacMan.prototype = new Drawable();
+
+class Ghost extends Drawable {
+    init (x, y) {
+        this.x = x;
+        this.y = y;
+
+        return this;
+    }
+}
+
+/**
+ * The quadtree to store pac-man ghosts and other collidable objects
+ * The quadrant indecis are numbers below
+ * 1 | 0
+ * -----
+ * 3 | 2
+ */
+class QuadTree {
+    constructor (x, y, width, height, level) {
+        this.x = x;
+        this.y = y;
+        this.width = width;
+        this.height = height;
+        this.level = level;
+        this.maxObjects = 10;
+    }
+}
 
 /**
  * This is the game object that takes care of all the objects 
