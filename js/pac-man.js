@@ -18,7 +18,12 @@ var imageRepository = new function(){
  * functions.
  */
 class Drawable {
-    constructor (){
+    constructor (x, y, width, height){
+        this.x = x;
+        this.y = y;
+        this.width = width;
+        this.height = height;
+        this.isColliding = false;
         this.speed = 0;
         this.canvasWidth = 0;
         this.canvasHeight = 0;
@@ -166,18 +171,72 @@ class Ghost extends Drawable {
 /**
  * The quadtree to store pac-man ghosts and other collidable objects
  * The quadrant indecis are numbers below
- * 1 | 0
+ * 0 | 1
  * -----
  * 3 | 2
  */
 class QuadTree {
     constructor (x, y, width, height, level) {
+        if (
+            !Number.isInteger(x) || 
+            !Number.isInteger(y) || 
+            !Number.isInteger(width) || 
+            !Number.isInteger(height)  ||
+            !Number.isInteger(level) 
+        ) {
+            throw new TypeError("x, y, width, height, level must be integer");
+        } 
+        if (width <= 0 || height <= 0){
+            throw new RangeError("width and heght must be positive integer");
+        }
         this.x = x;
         this.y = y;
         this.width = width;
         this.height = height;
         this.level = level;
         this.maxObjects = 10;
+        this.objects = [];
+        this.nodes = [];
+    }
+
+    /**
+     * clear objcts list and all nodes 
+     */
+    clear () {
+        for (var i = 0; i < this.nodes.length; i++) {
+            this.nodes[i].clear();
+        }
+
+        this.objects = [];
+        this.nodes = [];
+        return true;
+    }
+
+    /**
+     * Insert objects
+     */
+    insert (object) {
+        if (Array.isArray(object)) {
+            this.objects = this.objects.concat(object);
+        } else {
+            this.objects.push(object);
+        }
+        return true;
+    }
+
+    /**
+     * Split nodes into four nodes
+     */
+    split () {
+        var nodeWidth = parseInt(this.width/2);
+        var nodeHeight = parseInt(this.height/2);
+        
+        this.nodes[0] = new QuadTree(this.x, this.y, nodeWidth, nodeHeight, this.level + 1);
+        this.nodes[1] = new QuadTree(this.x + nodeWidth, this.y, this.width - nodeWidth, nodeHeight, this.level + 1);
+        this.nodes[2] = new QuadTree(this.x + nodeWidth, this.y + nodeHeight, this.width - nodeWidth, this.height - nodeHeight, this.level + 1);
+        this.nodes[3] = new QuadTree(this.x, this.y + nodeHeight, nodeWidth, this.height - nodeHeight, this.level + 1);
+
+        return true;
     }
 }
 

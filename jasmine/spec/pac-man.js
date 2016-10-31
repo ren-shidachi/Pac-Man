@@ -1,3 +1,13 @@
+describe("Drawable", function () {
+    it("Drawable basic behaviour", function () {
+        var d = new Drawable(0, 0, 4, 4);
+        expect(d.x).toBe(0);
+        expect(d.y).toBe(0);
+        expect(d.width).toBe(4);
+        expect(d.height).toBe(4);
+    });
+});
+
 describe("PacMan test", function() {
     var pacMan = false;
 
@@ -92,26 +102,68 @@ describe("Ghost", function() {
 
 describe ("Quadtree", function () {
     var quadTree = false;
-
     beforeAll(function (){
         // x, y, width, height, level
         quadTree = new QuadTree(0, 0, 64, 64, 0);
     });
 
-    afterAll(function () {
-        delete quadTree;
-    });
-
-    it("Constructor check", function () {
+    it("constructor", function () {
         expect(quadTree.x).toBe(0);
         expect(quadTree.y).toBe(0);
         expect(quadTree.width).toBe(64);
         expect(quadTree.height).toBe(64);
         expect(quadTree.level).toBe(0);
         expect(quadTree.maxObjects).toBe(10);
+        expect(quadTree.objects).toEqual([]);
+        expect(quadTree.nodes).toEqual([]);
+    });
+
+    it("construciton error", function () {
+        var zeroWidth = function () {
+            return new QuadTree(0, 0, 0, 0, 0);
+        };
+        var floatX = function () {
+            return new QuadTree(0.1, 0.1, 1.5, 1.5, 0);
+        }
+        expect(zeroWidth).toThrowError(RangeError);
+        expect(floatX).toThrowError(TypeError);
+    });
+
+    it("split nodes", function() { 
+        expect(quadTree.split()).toBe(true);
+        expect(quadTree.nodes.length).toBe(4);
+        expect(quadTree.nodes[0]).toEqual(new QuadTree(0,0,32,32,1));
+        expect(quadTree.nodes[1]).toEqual(new QuadTree(32,0,32,32,1));
+        expect(quadTree.nodes[2]).toEqual(new QuadTree(32,32,32,32,1));
+        expect(quadTree.nodes[3]).toEqual(new QuadTree(0,32,32,32,1));
+    });
+
+    it("split nodes (with uneven number width and height)", function () {
+        var x = new QuadTree(0, 0, 17, 23, 0);
+        expect(x.split()).toBe(true);
+        expect(x.nodes.length).toBe(4);
+        expect(x.nodes[0]).toEqual(new QuadTree(0,0,8,11,1));
+        expect(x.nodes[1]).toEqual(new QuadTree(8,0,9,11,1));
+        expect(x.nodes[2]).toEqual(new QuadTree(8,11,9,12,1));
+        expect(x.nodes[3]).toEqual(new QuadTree(0,11,8,12,1));
+    });
+
+    it("Clear objects", function () {
+        // Test insert first
+        expect(quadTree.clear()).toBe(true);
+        expect(quadTree.objects).toEqual([]);
+        expect(quadTree.nodes).toEqual([]);
     });
 
     it("Inserting objects", function () {
-        quadTree.insert(new Drawable());
+        var x = new Drawable(0,0,4,4);
+        var y = new Drawable(1,1,4,4);
+        var xy = [x, y, x, y, x, y, x, y];
+        expect(quadTree.insert(x)).toBe(true);
+        expect(quadTree.objects).toEqual([x]);
+        expect(quadTree.insert(y)).toBe(true);
+        expect(quadTree.objects).toEqual([x,y]);
+        expect(quadTree.insert(xy)).toBe(true);
+        expect(quadTree.objects).toEqual([x,y,x,y,x,y,x,y,x,y]);
     });
 });
