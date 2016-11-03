@@ -155,15 +155,44 @@ describe ("Quadtree", function () {
         expect(quadTree.nodes).toEqual([]);
     });
 
+    it("getIndex function", function () {
+        var x = new QuadTree(0, 0, 64, 64, 0);
+        expect(x.getIndex(new Drawable(0, 0, 4, 4))).toBe(0);
+        expect(x.getIndex(new Drawable(32, 0, 4, 4))).toBe(1);
+        expect(x.getIndex(new Drawable(32, 32, 4, 4))).toBe(2);
+        expect(x.getIndex(new Drawable(0, 32, 4, 4))).toBe(3);
+        expect(x.getIndex(new Drawable(0, 30, 4, 4))).toBe(-1);
+    });
+
     it("Inserting objects", function () {
         var x = new Drawable(0,0,4,4);
-        var y = new Drawable(1,1,4,4);
+        var y = new Drawable(32,32,4,4);
         var xy = [x, y, x, y, x, y, x, y];
+        var z = new Drawable(31, 31, 4, 4);
         expect(quadTree.insert(x)).toBe(true);
         expect(quadTree.objects).toEqual([x]);
-        expect(quadTree.insert(y)).toBe(true);
+        quadTree.insert(y);
         expect(quadTree.objects).toEqual([x,y]);
         expect(quadTree.insert(xy)).toBe(true);
         expect(quadTree.objects).toEqual([x,y,x,y,x,y,x,y,x,y]);
+        expect(quadTree.objects.length).toBe(10);
+        // x should all go to north west node, 
+        // y should all go to south east node,
+        // z should stay in this node.
+        quadTree.insert(z);
+        expect(quadTree.objects.length).toBe(1);
+        expect(quadTree.objects).toEqual([z]);
+        expect(quadTree.nodes[0].objects).toEqual([x,x,x,x,x]);
+        expect(quadTree.nodes[2].objects).toEqual([y,y,y,y,y]);
+    });
+
+    it("findObjects", function () {
+        quadTree.clear();
+        var x = new Drawable(0,0,4,4);
+        var y = new Drawable(32,32,4,4);
+        var z = new Drawable(31, 31, 4, 4);
+        quadTree.insert([x,x,x,x,x,y,y,y,y,y,z]);
+        expect(quadTree.findObjects(x)).toEqual([x,x,x,x,x,z]);
+        expect(quadTree.findObjects(z)).toEqual([x,x,x,x,x,y,y,y,y,y,z]);
     });
 });

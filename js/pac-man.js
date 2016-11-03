@@ -200,7 +200,7 @@ class QuadTree {
     }
 
     /**
-     * clear objcts list and all nodes 
+     * Clear objects and nodes recursively
      */
     clear () {
         for (var i = 0; i < this.nodes.length; i++) {
@@ -214,14 +214,55 @@ class QuadTree {
 
     /**
      * Insert objects
+     * 
+     * Inserts object or list of objects
+     * If number of objects exceeds maxObjects
+     * split nodes and insert each objects 
+     * in the right node.
      */
     insert (object) {
+        // Insert all objects in list
         if (Array.isArray(object)) {
             this.objects = this.objects.concat(object);
         } else {
             this.objects.push(object);
         }
+        // Check objects does not exceed maxObjects
+        if (this.objects.length > this.maxObjects) {
+            this.split();
+            var newObjects = []; // the objects that remains in this node
+            for (var n = 0; n < this.objects.length; n++) {
+                var index = this.getIndex(this.objects[n]);
+                if (index >= 0) {
+                    this.nodes[index].insert(this.objects[n]);
+                } else {
+                    newObjects.push(this.objects[n]);
+                }
+            }
+            this.objects = newObjects;
+        }
         return true;
+    }
+
+    /**
+     * Find objects
+     * return array of objects that a given 
+     * object possibly collide with
+     */
+    findObjects (o) {
+        var objects = [];
+        if (this.nodes.length > 0) {
+            var index = this.getIndex(o);
+            if (index != -1) {
+                objects = objects.concat(this.nodes[index].findObjects(o));
+            } else {
+                for (index = 0; index < this.nodes.length; index++) {
+                    objects = objects.concat(this.nodes[index].findObjects(o));
+                }
+            }
+        }
+        objects = objects.concat(this.objects);
+        return objects;
     }
 
     /**
@@ -237,6 +278,33 @@ class QuadTree {
         this.nodes[3] = new QuadTree(this.x, this.y + nodeHeight, nodeWidth, this.height - nodeHeight, this.level + 1);
 
         return true;
+    }
+
+    /*
+     * A helper function to determine
+     * which node the object should fit.
+     * returns -1 if object does not fit 
+     * to any nodes.
+     */
+    getIndex (object) {
+        var index = -1;
+        var nodeWidth = parseInt(this.width/2);
+        var nodeHeight = parseInt(this.height/2);
+        
+        if (object.x + object.width < nodeWidth) {
+            if (object.y + object.height < nodeHeight) {
+                index = 0; // Completely fits in north west node 
+            } else if (object.y >= nodeHeight) {
+                index = 3; // Completely fits in south west node 
+            }
+        } else if (object.x >= nodeWidth) {
+            if (object.y + object.height < nodeHeight) {
+                index = 1; // Completely fits in north east node 
+            } else if (object.y >= nodeHeight) {
+                index = 2; // Completely fits in south east node 
+            }
+        }
+        return index;
     }
 }
 
